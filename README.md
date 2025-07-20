@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>موقعي الإخباري</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+    header {
+      background-color: #1a73e8;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+    }
+    header img {
+      height: 60px;
+    }
+    #siteName {
+      font-size: 20px;
+    }
+    .menu {
+      cursor: pointer;
+      font-size: 28px;
+    }
+    #adminPanel {
+      display: none;
+      padding: 20px;
+      background-color: #fff;
+      border-top: 2px solid #ccc;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-bottom: 4px;
+    }
+    input[type="text"], input[type="file"], textarea, select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    textarea {
+      height: 100px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #articles {
+      padding: 20px;
+    }
+    .article {
+      background: white;
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .article img {
+      max-width: 100%;
+      height: auto;
+    }
+    .editor-name {
+      font-size: 13px;
+      color: #777;
+      margin-top: 5px;
+    }
+    .article h3 {
+      margin: 10px 0;
+    }
+    .share-buttons a {
+      margin-left: 10px;
+      text-decoration: none;
+      color: #1a73e8;
+      font-weight: bold;
+    }
+    .filter-buttons {
+      text-align: center;
+      margin: 10px;
+    }
+    .filter-buttons button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="menu" onclick="openLogin()">☰</div>
+  <h2 id="siteName">موقعي الإخباري</h2>
+  <img id="siteLogo" src="https://via.placeholder.com/120x60.png?text=Logo" alt="شعار الموقع">
+</header>
+
+<!-- لوحة الدخول والإدارة -->
+<div id="adminPanel">
+  <h3>لوحة الإدارة</h3>
+
+  <div class="form-group">
+    <label>تغيير اسم الموقع:</label>
+    <input type="text" id="newSiteName" placeholder="أدخل الاسم الجديد">
+    <button onclick="changeSiteName()">حفظ الاسم</button>
+  </div>
+
+  <div class="form-group">
+    <label>تغيير الشعار:</label>
+    <input type="file" id="logoInput" accept="image/*" onchange="changeLogo(event)">
+  </div>
+
+  <div class="form-group">
+    <label>لون الخلفية:</label>
+    <input type="color" id="bgColorPicker" onchange="changeBgColor()">
+  </div>
+
+  <div class="form-group">
+    <label>لون العناوين:</label>
+    <input type="color" id="titleColorPicker" onchange="changeTitleColor()">
+  </div>
+
+  <hr>
+
+  <h4>إضافة مقال جديد</h4>
+  <div class="form-group">
+    <label>عنوان المقال:</label>
+    <input type="text" id="articleTitle">
+  </div>
+  <div class="form-group">
+    <label>صورة للخبر:</label>
+    <input type="file" id="articleImage" accept="image/*">
+  </div>
+  <div class="form-group">
+    <label>اسم المحرر:</label>
+    <input type="text" id="editorName">
+  </div>
+  <div class="form-group">
+    <label>تصنيف المقال:</label>
+    <select id="articleCategory">
+      <option value="عام">عام</option>
+      <option value="سياسة">سياسة</option>
+      <option value="رياضة">رياضة</option>
+      <option value="اقتصاد">اقتصاد</option>
+      <option value="حوادث">حوادث</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>محتوى الخبر:</label>
+    <textarea id="articleContent"></textarea>
+  </div>
+  <button onclick="addArticle()">نشر المقال</button>
+</div>
+
+<!-- أزرار التصنيف -->
+<div class="filter-buttons">
+  <button onclick="filterArticles('all')">عرض الكل</button>
+  <button onclick="filterArticles('سياسة')">سياسة</button>
+  <button onclick="filterArticles('رياضة')">رياضة</button>
+  <button onclick="filterArticles('اقتصاد')">اقتصاد</button>
+  <button onclick="filterArticles('حوادث')">حوادث</button>
+</div>
+
+<!-- عرض المقالات -->
+<div id="articles">
+  <h3>أحدث الأخبار</h3>
+</div>
+
+<script>
+  function openLogin() {
+    const password = prompt("ادخل كلمة السر للدخول إلى لوحة الإدارة:");
+    if (password === "Sh@#1234{") {
+      document.getElementById("adminPanel").style.display = "block";
+    } else {
+      alert("كلمة السر غير صحيحة");
+    }
+  }
+
+  function changeSiteName() {
+    const newName = document.getElementById("newSiteName").value;
+    if (newName.trim() !== "") {
+      document.getElementById("siteName").textContent = newName;
+    }
+  }
+
+  function changeLogo(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        document.getElementById("siteLogo").src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function changeBgColor() {
+    document.body.style.backgroundColor = document.getElementById("bgColorPicker").value;
+  }
+
+  function changeTitleColor() {
+    document.querySelectorAll("h3").forEach(el => {
+      el.style.color = document.getElementById("titleColorPicker").value;
+    });
+  }
+
+  function addArticle() {
+    const title = document.getElementById("articleTitle").value;
+    const editor = document.getElementById("editorName").value;
+    const content = document.getElementById("articleContent").value;
+    const category = document.getElementById("articleCategory").value;
+    const imageFile = document.getElementById("articleImage").files[0];
+
+    if (!title || !editor || !content || !imageFile) {
+      alert("يرجى ملء جميع الحقول وإضافة صورة");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const articlesDiv = document.getElementById("articles");
+      const date = new Date().toLocaleString('ar-EG');
+      const articleId = Date.now();
+      const link = window.location.href + "#article-" + articleId;
+
+      const articleHTML = `
+        <div class="article" data-category="${category}" id="article-${articleId}">
+          <img src="${e.target.result}" alt="صورة الخبر">
+          <div class="editor-name">بقلم: ${editor} – ${date}</div>
+          <h3>${title}</h3>
+          <p>${content}</p>
+          <div><strong>التصنيف:</strong> ${category}</div>
+          <div class="share-buttons">
+            <span>مشاركة:</span>
+            <a href="https://wa.me/?text=${encodeURIComponent(link)}" target="_blank">واتساب</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}" target="_blank">فيسبوك</a>
+            <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}" target="_blank">تويتر</a>
+          </div>
+        </div>
+      `;
+      articlesDiv.innerHTML += articleHTML;
+
+      // تفريغ الحقول
+      document.getElementById("articleTitle").value = "";
+      document.getElementById("editorName").value = "";
+      document.getElementById("articleContent").value = "";
+      document.getElementById("articleImage").value = "";
+    };
+    reader.readAsDataURL(imageFile);
+  }
+
+  function filterArticles(category) {
+    const articles = document.querySelectorAll(".article");
+    articles.forEach(article => {
+      const artCat = article.getAttribute("data-category");
+      article.style.display = (category === "all" || artCat === category) ? "block" : "none";
+    });
+  }
+</script>
+
+</body>
+</html>
